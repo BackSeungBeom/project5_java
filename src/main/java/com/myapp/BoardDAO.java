@@ -1,63 +1,53 @@
-package com.example;
+package com.myapp;
 
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import java.sql.ResultSet;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class BoardDAO {
-    
-    private JdbcTemplate template;
-    
-    public void setTemplate(JdbcTemplate template){
-        this.template = template;
-    }
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
-    private final String BOARD_INSERT = "insert into BOARD (category, title, writer, content) values (?,?,?,?)";
+    private final String BOARD_INSERT = "insert into BOARD (category, title, writer, content) values (?, ?, ?, ?)";
     private final String BOARD_UPDATE = "update BOARD set category=?, title=?, writer=?, content=? where seq=?";
     private final String BOARD_DELETE = "delete from BOARD  where seq=?";
     private final String BOARD_GET = "select * from BOARD  where seq=?";
     private final String BOARD_LIST = "select * from BOARD order by seq desc";
 
-    public int insertBoard(BoardVO vo){
-        return template.update(BOARD_INSERT,new
-                Object[]{vo.getCategory(), vo.getTitle(), vo.getWriter(), vo.getContent()});
+    public int insertBoard(BoardVO vo) {
+        String sql = "insert into BOARD (category, title, writer, content) values ("
+                + "'" + vo.getCategory() + "',"
+                + "'" + vo.getTitle() + "',"
+                + "'" + vo.getWriter() + "',"
+                + "'" + vo.getContent()+ "')";
+        return jdbcTemplate.update(sql);
     }
 
-    public int deleteBoard(int id){
-        return template.update(BOARD_DELETE,new
-                Object[]{id});
+    public int deleteBoard(int seq) {
+        String sql = "delete from BOARD  where seq = " + seq;
+        return jdbcTemplate.update(sql);
     }
 
-    public int updateBoard(BoardVO vo){
-        return template.update(BOARD_UPDATE,new
-                Object[]{vo.getCategory(), vo.getTitle(), vo.getWriter(), vo.getContent(), vo.getSeq()});
+    public int updateBoard(BoardVO vo) {
+        String sql = "update BOARD set category='"
+                + vo.getCategory() + "',"
+                + " title ='" + vo.getTitle() + "',"
+                + " writer ='" + vo.getWriter() + "',"
+                + " content ='" + vo.getContent() + "' where seq=" + vo.getSeq();
+        return jdbcTemplate.update(sql);
     }
 
-    public BoardVO getBoard(int seq){
-        return template.queryForObject(BOARD_GET,
-                new Object[]{seq},
-                new BeanPropertyRowMapper<BoardVO>(BoardVO.class));
+    public BoardVO getBoard(int seq) {
+        String sql = "select * from BOARD where seq=" + seq;
+        return jdbcTemplate.queryForObject(sql, new BoardRowMapper());
     }
 
     public List<BoardVO> getBoardList(){
-        return template.query(BOARD_LIST, new RowMapper<BoardVO>(){
-
-            @Override
-            public BoardVO mapRow(ResultSet rs, int rowNum) throws SQLException{
-                BoardVO data = new BoardVO();
-                data.setSeq(rs.getInt("seq"));
-                data.setCategory(rs.getString("category"));
-                data.setTitle(rs.getString("title"));
-                data.setRegdate(rs.getDate("regdate"));
-                data.setWriter(rs.getString("writer"));
-                return data;
-            }
-        });
+        String sql = "select * from BOARD order by regdate desc";
+        return jdbcTemplate.query(sql, new BoardRowMapper());
     }
 }

@@ -1,12 +1,17 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" isELIgnored="false" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
+<style>
+    td{
+        text-align: center;
+    }
+</style>
 <head>
     <script>
         function delete_ok(id) {
-            var a = confirm("정말로 삭제하겠습니까?");
-            if (a) location.href = 'delete/' + id;
+            var a = confirm("정말로 삭제 하시겠습니까?");
+            if (a) location.href = 'deleteok/' + id;
         }
     </script>
     <title>Title</title>
@@ -21,6 +26,7 @@
         <th>Writer</th>
         <th>Content</th>
         <th>Regdate</th>
+        <th>View</th>
         <th>Edit</th>
         <th>Delete</th>
     </tr>
@@ -33,11 +39,12 @@
             <td>${u.writer}</td>
             <td>${u.content}</td>
             <td>${u.regdate}</td>
-            <td><a href="editform/${u.seq}">Edit</a></td>
-            <td><a href="javascript:delete_ok('${u.seq}">Delete</a> </td>
+            <td><a href="view/${u.seq}">내용보기</a></td>
+            <td><a href="editform/${u.seq}">수정</a></td>
+            <td><a href="javascript:delete_ok('${u.seq}')">삭제</a></td>
         </tr>
     </c:forEach>
 </table>
-<br/><a href="addform">Add New Post</a>
+<br/><a href="add">추가</a>
 </body>
 </html>
